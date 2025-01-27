@@ -1,0 +1,30 @@
+.sidebar {
+  height: 100vh;
+  background-color: #7b141e; /* Aquí se cambió el color de fondo */
+  transition: all 0.3s;
+  padding: 0;
+}
+
+  
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+  }
+  
+  .menu-item {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2em;
+    text-align: left;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .menu-item:hover {
+    background-color: #ba2d36;
+  }
+  

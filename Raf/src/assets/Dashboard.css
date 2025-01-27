@@ -1,0 +1,118 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  
+  .dashboard {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background-color: #e63946;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .profile {
+    text-align: center;
+  }
+  
+  .profile-pic {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+  }
+  
+  .profile-name {
+    font-size: 1.2em;
+    margin: 0;
+  }
+  
+  .profile-email {
+    font-size: 0.9em;
+    color: #ffddd2;
+  }
+  
+  .menu ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  
+  .menu li {
+    margin: 15px 0;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  /* Main Content */
+  .main {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-header {
+    border-bottom: 2px solid #f4f4f9;
+    margin-bottom: 20px;
+  }
+  
+  .main-header h1 {
+    margin: 0;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .roles h3 {
+    color: #e63946;
+  }
+  
+  .roles ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .roles li {
+    margin: 10px 0;
+  }
+  
+  .progress {
+    margin-top: 20px;
+  }
+  
+  .progress-bar {
+    margin-bottom: 15px;
+  }
+  
+  .progress-bar span {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .bar {
+    background-color: #f4f4f9;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  .fill {
+    background-color: #e63946;
+    height: 100%;
+  }
+  

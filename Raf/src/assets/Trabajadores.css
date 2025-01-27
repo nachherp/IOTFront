@@ -1,0 +1,70 @@
+.trabajadores-container {
+  padding: 20px;
+  background-color: #fbf6f6; 
+  border-radius: 8px;
+  box-shadow: 0 12px 24px #f8bfc4;
+  color: #000000; 
+}
+
+
+  
+  .trabajadores-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff; 
+    background-color: #7b141e; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    text-align: center; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  }
+  
+  
+  .trabajadores-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff; 
+    border-radius: 8px; 
+    overflow: hidden; 
+  }
+  
+  .trabajadores-table th {
+    background-color: #8F262B; 
+    color: #fff; 
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+  }
+  
+  .trabajadores-table th,
+  .trabajadores-table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #708D81;
+  }
+  
+  .trabajadores-table th {
+    font-size: 16px;
+    color: #f2e7e7;
+  }
+  
+  .trabajadores-table tr:hover {
+    background-color: #ff4b4b;
+  }
+  
+  .agregar-button {
+    margin-top: 20px;
+    background-color: #ff4b4b;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .agregar-button:hover {
+    background-color: #4f48d7;
+  }
+  

@@ -1,0 +1,80 @@
+.sidebar {
+  height: 100vh;
+  background-color: #7b141e; 
+  transition: all 0.3s;
+  padding: 0;
+}
+
+  .userSection {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(7, 166, 68, 0.1);
+    margin-bottom: 1rem;
+  }
+  
+  .userIcon {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .userInfo h3 {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  .userInfo p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .navLink {
+    color: rgba(149, 149, 149, 0.7);
+    transition: all 0.3s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .navLink:hover {
+    background-color: rgba(252, 253, 252, 0.2); /* Cambiar el fondo al pasar el mouse */
+    color: #f9fefb; /* Mantener coherencia con el color activo */
+  }
+  
+  .active {
+    color: #f2e3e5 !important; /* Cambia el color activo a verde */
+    font-weight: bold; /* Opcional: Añadir un peso de fuente mayor */
+  }
+  
+  
+  .inactive {
+    color: #f7f7f7; 
+  }
+  
+  .icon {
+    font-size: 1.3rem;
+    margin-right: 1rem;
+  }
+  
+  @media (max-width: 767.98px) {
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+  
+    .sidebar.show {
+      left: 0;
+    }
+  }
+    
+  
