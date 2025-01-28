@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
     { name: "Trabajadores", icon: FaUsers },
     { name: "Proyectos", icon: FaProjectDiagram },
     { name: "Equipos", icon: FaLayerGroup },
-    { name: "Materiales", icon: FaBoxes },
+    { name: "Recursos", icon: FaBoxes },
   ];
 
   const handleItemClick = (itemName: string) => {

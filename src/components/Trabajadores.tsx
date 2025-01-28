@@ -7,9 +7,9 @@ interface TrabajadoresProps {
 
 const Trabajadores: React.FC<TrabajadoresProps> = ({ setIsAddingWorker }) => {
   const trabajadores = [
-    { nombre: "Jane Cooper", edad: 24, telefono: "(225) 555-0118", email: "jane@microsoft.com", rol: "Desarrollador Front-end", equipo: "Nombre del equipo" },
-    { nombre: "Floyd Miles", edad: 26, telefono: "(205) 555-0100", email: "floyd@yahoo.com", rol: "Diseñador", equipo: "Nombre del equipo" },
-    { nombre: "Mariana Cruz", edad: 45, telefono: "(556) 678-0987", email: "cruz_m@gmail.com", rol: "Diseñador", equipo: "Nombre del equipo" }
+    { nombre: "Jane Cooper", edad: 24, telefono: "(225) 555-0118", email: "jane@microsoft.com", rol: "Desarrollador Front-end", carga: "Carga de trabajo" ,equipo: "Nombre del equipo"},
+    { nombre: "Floyd Miles", edad: 26, telefono: "(205) 555-0100", email: "floyd@yahoo.com", rol: "Diseñador", carga: "Carga de trabajo",equipo: "Nombre del equipo" },
+    { nombre: "Mariana Cruz", edad: 45, telefono: "(556) 678-0987", email: "cruz_m@gmail.com", rol: "Diseñador", carga: "Carga de trabajo" ,equipo: "Nombre del equipo"}
     // Otros trabajadores...
   ];
 
@@ -24,7 +24,8 @@ const Trabajadores: React.FC<TrabajadoresProps> = ({ setIsAddingWorker }) => {
             <th>Teléfono</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Equipo asignado</th>
+            <th>Carga</th>
+            <th>Equipo </th>
           </tr>
         </thead>
         <tbody>
@@ -35,6 +36,7 @@ const Trabajadores: React.FC<TrabajadoresProps> = ({ setIsAddingWorker }) => {
               <td>{trabajador.telefono}</td>
               <td>{trabajador.email}</td>
               <td>{trabajador.rol}</td>
+              <td>{trabajador.carga}</td>
               <td>{trabajador.equipo}</td>
             </tr>
           ))}

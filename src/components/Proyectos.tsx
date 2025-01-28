@@ -43,7 +43,7 @@ function Proyectos({ setIsAddingProject }) {
       <table className="proyectos-tabla">
         <thead>
           <tr>
-            <th>Proyecto</th>
+            <th>Nombre</th>
             <th>Prioridad</th>
             <th>Tipo</th>
             <th>Descripción</th>
