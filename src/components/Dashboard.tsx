@@ -1,13 +1,53 @@
-import React from "react"
-import styles from "./Dashboard.module.css"
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from '../api/axios.ts';
+import styles from "./Dashboard.module.css";
 
 const Dashboard = () => {
+  const [code, setCode] = useState('');
+  const [qrCode, setQrCode] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchQrCode = async () => {
+      const email = localStorage.getItem('email'); // Obtener el email del localStorage
+      if (!email) {
+        console.error('Email no encontrado en localStorage.');
+        return;
+      }
+
+      try {
+        const response = await api.post('/auth/generate-2fa-secret', { email });
+        setQrCode(response.data.qrCode);
+      } catch (error) {
+        console.error('Error al generar el QR code:', error.response?.data?.message || error);
+      }
+    };
+
+    fetchQrCode();
+  }, []);
+
+  const handleVerify2FA = async (e) => {
+    e.preventDefault();
+    try {
+      const email = localStorage.getItem('email');
+      const response = await api.post('/auth/verify-2fa', { email, code });
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      alert('Inicio de sesión exitoso');
+      navigate('/dashboard'); // Redirigir al dashboard
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Código 2FA inválido');
+      alert(error.response?.data?.message || 'Código 2FA inválido');
+    }
+  };
+
   const progress = [
     { area: "Diseño", porcentaje: 20 },
     { area: "Base de Datos", porcentaje: 35 },
     { area: "Frontend", porcentaje: 25 },
     { area: "Backend", porcentaje: 15 },
-  ]
+  ];
 
   const team = [
     {
@@ -25,7 +65,7 @@ const Dashboard = () => {
         { name: "Julian Maldonado", role: "Dueño" },
       ],
     },
-  ]
+  ];
 
   return (
     <div className={styles.container}>
@@ -65,10 +105,26 @@ const Dashboard = () => {
             </div>
           ))}
         </div>
+
+        {/* Contenedor del QR Code y formulario 2FA */}
+        <div className={styles.qrCodeContainer}>
+          {qrCode && <img src={qrCode} alt="QR Code para Google Authenticator" />}
+        </div>
+        <form onSubmit={handleVerify2FA}>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Código 2FA"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn-login">VERIFICAR</button>
+        </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
-
+export default Dashboard;

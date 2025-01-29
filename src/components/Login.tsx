@@ -14,30 +14,27 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Llamar al backend para validar credenciales y enviar código 2FA
       const response = await api.post('/auth/login', { email, password });
-      alert(response.data.message); // "Código 2FA enviado"
-      setStep(2); // Ir al siguiente paso
+      localStorage.setItem('email', email); // Guardar el email en localStorage
+      alert('Código 2FA enviado');
+      setStep(2); // Pasar a la verificación 2FA
     } catch (error) {
       console.error(error.response?.data?.message || 'Error al iniciar sesión');
-      alert('Error al iniciar sesión');
+      alert(error.response?.data?.message || 'Error al iniciar sesión');
     }
   };
 
   const handleVerify2FA = async (e) => {
     e.preventDefault();
     try {
-      // Llamar al backend para verificar el código 2FA
       const response = await api.post('/auth/verify-2fa', { email, code });
-      const token = response.data.accessToken;
-
-      // Guardar el token en el almacenamiento local
+      const token = response.data.token;
       localStorage.setItem('token', token);
       alert('Inicio de sesión exitoso');
       navigate('/dashboard'); // Redirigir al dashboard
     } catch (error) {
       console.error(error.response?.data?.message || 'Código 2FA inválido');
-      alert('Código 2FA inválido');
+      alert(error.response?.data?.message || 'Código 2FA inválido');
     }
   };
 
@@ -46,6 +43,7 @@ const Login = () => {
       <div className="login-image"></div>
       <div className="login-form">
         <h2>{step === 1 ? 'Login' : 'Verificación 2FA'}</h2>
+        
         {step === 1 ? (
           <form onSubmit={handleLogin}>
             <div className="form-group">
@@ -68,31 +66,30 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="form-remember">
-              <input type="checkbox" id="remember" />
-              <label htmlFor="remember">Recuerdame</label>
-            </div>
             <button type="submit" className="btn-login">LOGIN</button>
           </form>
         ) : (
-          <form onSubmit={handleVerify2FA}>
-            <div className="form-group">
-              <input
-                type="text"
-                placeholder="Código 2FA"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit" className="btn-login">VERIFICAR</button>
-          </form>
+          <div>
+            <form onSubmit={handleVerify2FA}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Código 2FA"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-login">VERIFICAR</button>
+            </form>
+          </div>
         )}
+
         {step === 1 && (
           <div className="form-footer">
-            <a href="#forgot">Olvidaste la contraseña?</a>
+            <a href="#forgot">¿Olvidaste la contraseña?</a>
             <p>
-              no tienes una cuenta? <Link to="/register">Registrate</Link>
+              ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
             </p>
           </div>
         )}

@@ -1,102 +1,155 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api/axios.ts';
 
-function RegisterForm() {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+const RegisterForm = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  
+  const [qrCode, setQrCode] = useState('');
+  const [verificationStep, setVerificationStep] = useState(false);
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Validación simple para confirmar que las contraseñas coincidan
-        if (formData.password === formData.confirmPassword) {
-            // Aquí puedes agregar lógica para manejar el registro, como una API call
-
-            // Redirigir al inicio de sesión después de registrarse
-            navigate('/login');
-        } else {
-            alert("Las contraseñas no coinciden.");
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
+    if (formData.password === formData.confirmPassword) {
+      try {
+        await api.post('/auth/register', {
+          nombre: formData.username, // Asegúrate de pasar el campo nombre correctamente
+          email: formData.email,
+          password: formData.password
         });
-    };
 
-    return (
-        <div className="login-container">
-            <div className="login-image"></div> {/* Imagen de fondo opcional */}
+        const qrResponse = await api.post('/auth/generate-2fa-secret', { email: formData.email });
+        setQrCode(qrResponse.data.qrCode);
+        setVerificationStep(true);
+      } catch (error) {
+        console.error('Error al registrar', error.response?.data?.message || error);
+        alert('Error al registrar');
+      }
+    } else {
+      alert("Las contraseñas no coinciden.");
+    }
+  };
 
-            <div className="login-form">
-                <h2>Crear Cuenta</h2>
-                <form onSubmit={handleSubmit}>
-                    
-                    <div className="form-group">
-                        <label htmlFor="email">
-                            <i className="bi bi-envelope input-icon"></i> Correo electrónico
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Correo electrónico"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+  const handleVerify2FA = async (e) => {
+    e.preventDefault();
+    const code = prompt('Ingresa el código 2FA generado por Google Authenticator');
+    if (!code) {
+      alert('No se ha ingresado un código 2FA');
+      return;
+    }
 
-                    <div className="form-group">
-                        <label htmlFor="password">
-                            <i className="bi bi-lock input-icon"></i> Contraseña
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Contraseña"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+    try {
+      const response = await api.post('/auth/verify-2fa', { email: formData.email, code });
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      alert('Verificación 2FA exitosa');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Código 2FA inválido', error.response?.data?.message || error);
+      alert('Código 2FA inválido');
+    }
+  };
 
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">
-                            <i className="bi bi-lock input-icon"></i> Confirmar Contraseña
-                        </label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Confirmar Contraseña"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
-                    <button type="submit" className="btn-login">Registrarse</button>
-                </form>
+  return (
+    <div className="login-container">
+      <div className="login-image"></div> {/* Imagen de fondo opcional */}
 
-                <div className="form-footer">
-                    <p>
-                        Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
-                    </p>
-                </div>
+      <div className="login-form">
+        <h2>Crear Cuenta</h2>
+        {!verificationStep ? (
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="username">
+              Nombre Completo
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Nombre Completo"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
             </div>
-        </div>
+
+            <div className="form-group">
+              <label htmlFor="email">
+              Correo electrónico
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Correo electrónico"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">
+              Contraseña
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Contraseña"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="confirmPassword">
+              Confirmar Contraseña
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirmar Contraseña"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <button type="submit" className="btn-login">Registrarse</button>
+          </form>
+        ) : (
+          <div className="qr-code-container">
+            <img src={qrCode} alt="QR Code para Google Authenticator" />
+            <button onClick={handleVerify2FA} className="btn-login">VERIFICAR CÓDIGO 2FA</button>
+          </div>
+        )}
+
+        <div className="form-footer">
+          <p>
+            ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
+          </p>
+      </div>
+      </div>
+      </div>
     );
-}
+    };
 
 export default RegisterForm;
