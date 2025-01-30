@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Trabajadores from "./components/Trabajadores";
@@ -51,16 +52,18 @@ const App: React.FC = () => {
       {/* Ruta de Registro */}
       <Route path="/register" element={<RegisterForm />} />
 
-      {/* Ruta del Dashboard y sus componentes */}
-      <Route
-        path="/dashboard"
-        element={
-          <div className="app">
-            <Sidebar setActiveComponent={setActiveComponent} />
-            <main className="main-content">{renderComponent()}</main>
-          </div>
-        }
-      />
+      {/* Rutas protegidas */}
+      <Route element={<PrivateRoute />}>
+        <Route
+          path="/dashboard"
+          element={
+            <div className="app">
+              <Sidebar setActiveComponent={setActiveComponent} />
+              <main className="main-content">{renderComponent()}</main>
+            </div>
+          }
+        />
+      </Route>
 
       {/* Redirección a Login por defecto */}
       <Route path="*" element={<Navigate to="/login" replace />} />

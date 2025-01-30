@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios.ts';
+import '../assets/Register.css';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const RegisterForm = () => {
     password: '',
     confirmPassword: ''
   });
-  
+
   const [qrCode, setQrCode] = useState('');
   const [verificationStep, setVerificationStep] = useState(false);
   const navigate = useNavigate();
@@ -17,23 +18,26 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password === formData.confirmPassword) {
-      try {
-        await api.post('/auth/register', {
-          nombre: formData.username, // Asegúrate de pasar el campo nombre correctamente
-          email: formData.email,
-          password: formData.password
-        });
-
-        const qrResponse = await api.post('/auth/generate-2fa-secret', { email: formData.email });
-        setQrCode(qrResponse.data.qrCode);
-        setVerificationStep(true);
-      } catch (error) {
-        console.error('Error al registrar', error.response?.data?.message || error);
-        alert('Error al registrar');
-      }
-    } else {
+    if (formData.password !== formData.confirmPassword) {
       alert("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      // 1️⃣ Registrar usuario en la base de datos
+      await api.post('/auth/register', {
+        nombre: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
+
+      // 2️⃣ Generar y obtener el QR del 2FA (se genera solo una vez)
+      const qrResponse = await api.post('/auth/generate-2fa-secret', { email: formData.email });
+      setQrCode(qrResponse.data.qrCode);
+      setVerificationStep(true);
+    } catch (error) {
+      console.error('Error al registrar', error.response?.data?.message || error);
+      alert('Error al registrar');
     }
   };
 
@@ -50,7 +54,7 @@ const RegisterForm = () => {
       const token = response.data.token;
       localStorage.setItem('token', token);
       alert('Verificación 2FA exitosa');
-      navigate('/dashboard');
+      navigate('/dashboard'); // Redirige al dashboard
     } catch (error) {
       console.error('Código 2FA inválido', error.response?.data?.message || error);
       alert('Código 2FA inválido');
@@ -67,16 +71,15 @@ const RegisterForm = () => {
 
   return (
     <div className="login-container">
-      <div className="login-image"></div> {/* Imagen de fondo opcional */}
+      <div className="login-image"></div>
 
       <div className="login-form">
         <h2>Crear Cuenta</h2>
+        <br />
         {!verificationStep ? (
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="username">
-              Nombre Completo
-              </label>
+              <label htmlFor="username">Nombre Completo</label>
               <input
                 type="text"
                 id="username"
@@ -89,9 +92,7 @@ const RegisterForm = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">
-              Correo electrónico
-              </label>
+              <label htmlFor="email">Correo electrónico</label>
               <input
                 type="email"
                 id="email"
@@ -104,9 +105,7 @@ const RegisterForm = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">
-              Contraseña
-              </label>
+              <label htmlFor="password">Contraseña</label>
               <input
                 type="password"
                 id="password"
@@ -119,9 +118,7 @@ const RegisterForm = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">
-              Confirmar Contraseña
-              </label>
+              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -132,7 +129,7 @@ const RegisterForm = () => {
                 required
               />
             </div>
-            
+
             <button type="submit" className="btn-login">Registrarse</button>
           </form>
         ) : (
@@ -146,10 +143,10 @@ const RegisterForm = () => {
           <p>
             ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
           </p>
+        </div>
       </div>
-      </div>
-      </div>
-    );
-    };
+    </div>
+  );
+};
 
 export default RegisterForm;

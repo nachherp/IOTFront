@@ -107,7 +107,7 @@ const Dashboard = () => {
         </div>
 
         {/* Contenedor del QR Code y formulario 2FA */}
-        <div className={styles.qrCodeContainer}>
+       {/*<div className={styles.qrCodeContainer}>
           {qrCode && <img src={qrCode} alt="QR Code para Google Authenticator" />}
         </div>
         <form onSubmit={handleVerify2FA}>
@@ -121,7 +121,7 @@ const Dashboard = () => {
             />
           </div>
           <button type="submit" className="btn-login">VERIFICAR</button>
-        </form>
+        </form>*/}
       </div>
     </div>
   );

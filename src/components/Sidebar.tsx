@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import styles from "./Sidebar.module.css";""
-import "../assets/Sidebar.css"
+import styles from "./Sidebar.module.css";
+import "../assets/Sidebar.css";
 import {
   FaTachometerAlt,
   FaUsers,
@@ -8,6 +8,7 @@ import {
   FaLayerGroup,
   FaBoxes,
   FaUser,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 interface SidebarProps {
@@ -30,6 +31,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
     setActiveComponent(itemName);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Elimina el token
+    window.location.href = "/login"; // Redirige al login
+  };
+
   return (
     <nav className={`${styles.sidebar} col-md-3 col-lg-2 d-md-block sidebar`}>
       <div className={styles.userSection}>
@@ -50,12 +56,19 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
                   activeItem === item.name ? styles.active : styles.inactive
                 }`}
               >
-                <item.icon className="me-3" />
+                <item.icon className="me-9" />
                 {item.name}
               </button>
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Botón de Cerrar Sesión */}
+      <div className={styles.logoutSection}>
+        <button onClick={handleLogout} className="btn btn-danger mt-4" style={{ width: "80%", margin: "0 auto", display: "block" }}>
+          <FaSignOutAlt className="me-2" /> Cerrar Sesión
+        </button>
       </div>
     </nav>
   );
