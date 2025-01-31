@@ -1,71 +1,87 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
+import MiembroDashboard from "./components/MiembroDashboard";
 import Trabajadores from "./components/Trabajadores";
 import Proyectos from "./components/Proyectos";
 import Equipos from "./components/Equipos";
-import Materiales from "./components/Materiales";
-import AgregarTrabajador from "./components/AgregarTrabajadores";
-import AgregarProyecto from "./components/AgregarProyecto";
+import Materiales from "./components/RecursosMiembro";
+import MisTareas from "./components/MisTareas";
+import MiembroEquipo from "./components/MiembroEquipo";
 import Login from "./components/Login";
 import RegisterForm from "./components/RegisterForm";
-
+import Recursos from "./components/Recursos"
 import "./App.css";
 
-const App: React.FC = () => {
+const AdminLayout: React.FC = () => {
   const [activeComponent, setActiveComponent] = useState("Dashboard");
-  const [isAddingWorker, setIsAddingWorker] = useState(false);
-  const [isAddingProject, setIsAddingProject] = useState(false);
 
   const renderComponent = () => {
-    if (isAddingWorker) {
-      return <AgregarTrabajador setIsAddingWorker={setIsAddingWorker} />;
-    }
-
-    if (isAddingProject) {
-      return <AgregarProyecto setIsAddingProject={setIsAddingProject} />;
-    }
-
     switch (activeComponent) {
       case "Dashboard":
         return <Dashboard />;
+      
       case "Trabajadores":
-        return <Trabajadores setIsAddingWorker={setIsAddingWorker} />;
+        return <Trabajadores />;
       case "Proyectos":
-        return <Proyectos setIsAddingProject={setIsAddingProject} />;
+        return <Proyectos />;
       case "Equipos":
         return <Equipos />;
-      case "Materiales":
-        return <Materiales />;
-      default:
-        return <Dashboard />;
+        case "Recursos":
+          return <Recursos />;
+      
     }
   };
 
   return (
-    <Routes>
-      {/* Ruta de Login */}
-      <Route path="/login" element={<Login />} />
+    <div className="app">
+      <Sidebar setActiveComponent={setActiveComponent} />
+      <main className="main-content">{renderComponent()}</main>
+    </div>
+  );
+};
 
-      {/* Ruta de Registro */}
+const MiembroLayout: React.FC = () => {
+  const [activeComponent, setActiveComponent] = useState("Dashboard");
+
+  const renderComponent = () => {
+    switch (activeComponent) {
+      case "Dashboard":
+        return <Dashboard />;
+      case "Mis Tareas":
+        return <MisTareas />;
+      case "Mi Equipo":
+        return <MiembroEquipo/>;
+        case "Recursos":
+          return <Materiales/>
+    
+    }
+  };
+
+  return (
+    <div className="app">
+      <Sidebar setActiveComponent={setActiveComponent} />
+      <main className="main-content">{renderComponent()}</main>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterForm />} />
 
-      {/* Rutas protegidas */}
-      <Route element={<PrivateRoute />}>
-        <Route
-          path="/dashboard"
-          element={
-            <div className="app">
-              <Sidebar setActiveComponent={setActiveComponent} />
-              <main className="main-content">{renderComponent()}</main>
-            </div>
-          }
-        />
+      <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+        <Route path="/dashboard" element={<AdminLayout />} />
       </Route>
 
-      {/* Redirección a Login por defecto */}
+      <Route element={<PrivateRoute allowedRoles={["miembro"]} />}>
+        <Route path="/miembro-dashboard" element={<MiembroLayout />} />
+      </Route>
+
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

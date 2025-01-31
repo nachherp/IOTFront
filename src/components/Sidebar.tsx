@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import "../assets/Sidebar.css";
 import {
@@ -17,8 +18,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
+  const [rol, setRol] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const menuItems = [
+  useEffect(() => {
+    const storedRol = localStorage.getItem("rol");
+    setRol(storedRol);
+  }, []);
+
+  const menuItemsAdmin = [
     { name: "Dashboard", icon: FaTachometerAlt },
     { name: "Trabajadores", icon: FaUsers },
     { name: "Proyectos", icon: FaProjectDiagram },
@@ -26,14 +34,25 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
     { name: "Recursos", icon: FaBoxes },
   ];
 
+  const menuItemsMiembro = [
+    { name: "Dashboard", icon: FaTachometerAlt },
+    { name: "Mis Tareas", icon: FaProjectDiagram },
+    { name: "Mi Equipo", icon: FaLayerGroup },
+    { name: "Recursos", icon: FaBoxes },
+  ];
+
+  const menuItems = rol === "admin" ? menuItemsAdmin : menuItemsMiembro;
+
   const handleItemClick = (itemName: string) => {
     setActiveItem(itemName);
     setActiveComponent(itemName);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Elimina el token
-    window.location.href = "/login"; // Redirige al login
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("email");
+    navigate("/login");
   };
 
   return (
@@ -41,8 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
       <div className={styles.userSection}>
         <FaUser className={styles.userIcon} />
         <div className={styles.userInfo}>
-          <h3>Cristiano Ronaldo</h3>
-          <p>mejorquemessi@gmail.com</p>
+          <h3>{rol === "admin" ? "Administrador" : "Miembro"}</h3>
+          <p>{localStorage.getItem("email")}</p>
         </div>
       </div>
 
@@ -56,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
                   activeItem === item.name ? styles.active : styles.inactive
                 }`}
               >
-                <item.icon className="me-9" />
+                <item.icon className="me-3" />
                 {item.name}
               </button>
             </li>
@@ -64,12 +83,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
         </ul>
       </div>
 
-      {/* Botón de Cerrar Sesión */}
-      <div className={styles.logoutSection}>
-        <button onClick={handleLogout} className="btn btn-danger mt-4" style={{ width: "80%", margin: "0 auto", display: "block" }}>
-          <FaSignOutAlt className="me-2" /> Cerrar Sesión
-        </button>
-      </div>
+      <button onClick={handleLogout} className="btn btn-danger mt-4" style={{ width: "80%", margin: "0 auto", display: "block" }}>
+        <FaSignOutAlt className="me-2" /> Cerrar Sesión
+      </button>
     </nav>
   );
 };

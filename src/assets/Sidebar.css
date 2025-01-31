@@ -9,17 +9,17 @@
   .menu {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 95px;
     width: 100%;
   }
   
   .menu-item {
     background: none;
     border: none;
-    color: #fff;
+    color: #dd2222;
     font-size: 1.2em;
     text-align: left;
-    padding: 10px 20px;
+    padding: 15px 30px;
     cursor: pointer;
     transition: background 0.3s;
   }

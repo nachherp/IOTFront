@@ -13,6 +13,7 @@ const RegisterForm = () => {
 
   const [qrCode, setQrCode] = useState('');
   const [verificationStep, setVerificationStep] = useState(false);
+  const [code, setCode] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -24,14 +25,12 @@ const RegisterForm = () => {
     }
 
     try {
-      // 1️⃣ Registrar usuario en la base de datos
       await api.post('/auth/register', {
         nombre: formData.username,
         email: formData.email,
         password: formData.password
       });
 
-      // 2️⃣ Generar y obtener el QR del 2FA (se genera solo una vez)
       const qrResponse = await api.post('/auth/generate-2fa-secret', { email: formData.email });
       setQrCode(qrResponse.data.qrCode);
       setVerificationStep(true);
@@ -43,18 +42,11 @@ const RegisterForm = () => {
 
   const handleVerify2FA = async (e) => {
     e.preventDefault();
-    const code = prompt('Ingresa el código 2FA generado por Google Authenticator');
-    if (!code) {
-      alert('No se ha ingresado un código 2FA');
-      return;
-    }
-
     try {
       const response = await api.post('/auth/verify-2fa', { email: formData.email, code });
       const token = response.data.token;
       localStorage.setItem('token', token);
-      alert('Verificación 2FA exitosa');
-      navigate('/dashboard'); // Redirige al dashboard
+      navigate('/miembro-dashboard');
     } catch (error) {
       console.error('Código 2FA inválido', error.response?.data?.message || error);
       alert('Código 2FA inválido');
@@ -72,9 +64,8 @@ const RegisterForm = () => {
   return (
     <div className="login-container">
       <div className="login-image"></div>
-
       <div className="login-form">
-        <h2>Crear Cuenta</h2>
+        <h2>{!verificationStep ? 'Crear Cuenta' : 'Verificación 2FA'}</h2>
         <br />
         {!verificationStep ? (
           <form onSubmit={handleSubmit}>
@@ -133,9 +124,21 @@ const RegisterForm = () => {
             <button type="submit" className="btn-login">Registrarse</button>
           </form>
         ) : (
-          <div className="qr-code-container">
-            <img src={qrCode} alt="QR Code para Google Authenticator" />
-            <button onClick={handleVerify2FA} className="btn-login">VERIFICAR CÓDIGO 2FA</button>
+          <div className="twofa-container">
+            <p>Escanea este código QR en Google Authenticator y luego ingresa el código generado.</p>
+            <img src={qrCode} alt="QR Code para Google Authenticator" className="qr-code" />
+            <form onSubmit={handleVerify2FA}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Código 2FA"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-login">VERIFICAR</button>
+            </form>
           </div>
         )}
 
