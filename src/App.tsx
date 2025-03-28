@@ -8,8 +8,8 @@ import Trabajadores from "./components/Trabajadores";
 import Proyectos from "./components/Proyectos";
 import Equipos from "./components/Equipos";
 import Materiales from "./components/RecursosMiembro";
-import MisTareas from "./components/MisTareas";
-import MiembroEquipo from "./components/MiembroEquipo";
+import Graficas from "./components/Graficas";
+import Parcelas from "./components/Parcelas";
 import Login from "./components/Login";
 import RegisterForm from "./components/RegisterForm";
 import Recursos from "./components/Recursos"
@@ -50,10 +50,10 @@ const MiembroLayout: React.FC = () => {
     switch (activeComponent) {
       case "Dashboard":
         return <Dashboard />;
-      case "Mis Tareas":
-        return <MisTareas />;
-      case "Mi Equipo":
-        return <MiembroEquipo/>;
+      case "Gráficas":
+        return <Graficas />;
+      case "Parcelas":
+        return <Parcelas/>;
         case "Recursos":
           return <Materiales/>
     

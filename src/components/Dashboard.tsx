@@ -1,127 +1,111 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import api from '../api/axios.ts';
-import styles from "./Dashboard.module.css";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { WiThermometer, WiHumidity, WiRain, WiDaySunny } from "react-icons/wi";
+
+const API_URL = "http://localhost:5000/sensor/dashboard"; 
 
 const Dashboard = () => {
-  const [code, setCode] = useState('');
-  const [qrCode, setQrCode] = useState('');
-  const navigate = useNavigate();
+  const [sensores, setSensores] = useState({
+    temperatura: 0,
+    humedad: 0,
+    lluvia: 0,
+    sol: 0,
+  });
+  const [parcelas, setParcelas] = useState<{ id_parcela: number; latitud: number; longitud: number; nombre: string; tipo_cultivo: string; responsable: string; ultimo_riego: string; }[]>([]);
 
   useEffect(() => {
-    const fetchQrCode = async () => {
-      const email = localStorage.getItem('email'); // Obtener el email del localStorage
-      if (!email) {
-        console.error('Email no encontrado en localStorage.');
-        return;
-      }
-
+    const fetchData = async () => {
       try {
-        const response = await api.post('/auth/generate-2fa-secret', { email });
-        setQrCode(response.data.qrCode);
+        
+        await axios.get("http://localhost:5000/sensor/sync");
+
+       
+        const response = await axios.get(API_URL);
+
+        if (response.data.lastRecord) {
+          setSensores({
+            temperatura: response.data.lastRecord.temperatura ?? 0,
+            humedad: response.data.lastRecord.humedad ?? 0,
+            lluvia: response.data.lastRecord.lluvia ?? 0,
+            sol: response.data.lastRecord.sol ?? 0,
+          });
+        }
+
+        if (response.data.parcelas) {
+          setParcelas(response.data.parcelas);
+        }
       } catch (error) {
-        console.error('Error al generar el QR code:', error.response?.data?.message || error);
+        console.error("Error al obtener datos del backend:", error);
       }
     };
 
-    fetchQrCode();
+    fetchData();
+    const interval = setInterval(fetchData, 10000); 
+    return () => clearInterval(interval);
   }, []);
 
-  const handleVerify2FA = async (e) => {
-    e.preventDefault();
-    try {
-      const email = localStorage.getItem('email');
-      const response = await api.post('/auth/verify-2fa', { email, code });
-      const token = response.data.token;
-      localStorage.setItem('token', token);
-      alert('Inicio de sesión exitoso');
-      navigate('/dashboard'); // Redirigir al dashboard
-    } catch (error) {
-      console.error(error.response?.data?.message || 'Código 2FA inválido');
-      alert(error.response?.data?.message || 'Código 2FA inválido');
-    }
-  };
-
-  const progress = [
-    { area: "Diseño", porcentaje: 20 },
-    { area: "Base de Datos", porcentaje: 35 },
-    { area: "Frontend", porcentaje: 25 },
-    { area: "Backend", porcentaje: 15 },
-  ];
-
-  const team = [
-    {
-      title: "Jefes de Área",
-      members: [
-        { name: "Jonathan Sanchez", role: "Probador de control de calidad" },
-        { name: "Marta Lopez", role: "Gestor de proyecto" },
-        { name: "Alfonso Garza", role: "Scrum Master" },
-      ],
-    },
-    {
-      title: "Administradores",
-      members: [
-        { name: "Saul Rodriguez", role: "Jefe de proyecto" },
-        { name: "Julian Maldonado", role: "Dueño" },
-      ],
-    },
-  ];
-
   return (
-    <div className={styles.container}>
-      {/* Columna izquierda */}
-      <div className={styles.column}>
-        <h1 className={styles.title}>Proyecto</h1>
-        <p className={styles.subtitle}>01 - 25 March, 2020</p>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        Cultivos del Sur | Mapa de Ubicaciones
+      </h1>
 
-        {team.map((section, idx) => (
-          <div key={idx}>
-            <h2 className={styles.sectionTitle}>{section.title}</h2>
-            <div>
-              {section.members.map((member, idx) => (
-                <div key={idx} className="mb-4">
-                  <span className={styles.memberName}>{member.name}</span>
-                  <p className={styles.memberRole}>{member.role}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Columna derecha */}
-      <div className={styles.column}>
-        <h2 className={styles.sectionTitle}>Progreso de equipo</h2>
-        <div className={styles.progressContainer}>
-          {progress.map((item, idx) => (
-            <div key={idx} className={styles.progressItem}>
-              <div className={styles.progressLabel}>
-                <span>{item.area}</span>
-                <span>{item.porcentaje}%</span>
-              </div>
-              <div className={styles.progressBar}>
-                <div className={styles.progressFill} style={{ width: `${item.porcentaje}%` }}></div>
-              </div>
-            </div>
-          ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+       
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden flex items-center justify-center">
+          <MapContainer
+            center={[21.065014, -86.887961]}
+            zoom={13}
+            className="w-full h-[500px]" 
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {parcelas.map((parcela) => (
+              <Marker key={parcela.id_parcela} position={[parcela.latitud, parcela.longitud]}>
+                <Popup>
+                  <strong>{parcela.nombre}</strong> <br />
+                  Cultivo: {parcela.tipo_cultivo} <br />
+                  Responsable: {parcela.responsable} <br />
+                  Último riego: {new Date(parcela.ultimo_riego).toLocaleString()}
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
 
-        {/* Contenedor del QR Code y formulario 2FA */}
-       {/*<div className={styles.qrCodeContainer}>
-          {qrCode && <img src={qrCode} alt="QR Code para Google Authenticator" />}
-        </div>
-        <form onSubmit={handleVerify2FA}>
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="Código 2FA"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-            />
+       
+        <div className="grid grid-cols-2 gap-4">
+         
+          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center">
+            <WiThermometer className="text-6xl text-red-500" />
+            <h2 className="text-xl font-semibold mt-2">Temperatura</h2>
+            <p className="text-4xl font-bold text-gray-900">{sensores.temperatura}°C</p>
           </div>
-          <button type="submit" className="btn-login">VERIFICAR</button>
-        </form>*/}
+
+          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center">
+            <WiHumidity className="text-6xl text-blue-500" />
+            <h2 className="text-xl font-semibold mt-2">Humedad</h2>
+            <p className="text-4xl font-bold text-gray-900">{sensores.humedad}%</p>
+          </div>
+
+      
+          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center">
+            <WiRain className="text-6xl text-blue-400" />
+            <h2 className="text-xl font-semibold mt-2">Lluvia</h2>
+            <p className="text-4xl font-bold text-gray-900">
+              {sensores.lluvia}
+            </p>
+          </div>
+
+    
+          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center">
+            <WiDaySunny className="text-6xl text-yellow-500" />
+            <h2 className="text-xl font-semibold mt-2">Intensidad del Sol</h2>
+            <p className="text-4xl font-bold text-gray-900">
+              {sensores.sol > 50 ? "Alta" : "Baja"}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
