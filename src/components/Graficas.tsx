@@ -47,7 +47,7 @@ const Historial = () => {
     fetchHistorial();
   }, []);
 
-  // 🔍 Filtrar por intervalo de tiempo (minutos)
+  
   const filtrado = (() => {
     const intervaloMs = intervalo * 60 * 1000;
     let ultimo = 0;

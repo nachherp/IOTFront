@@ -36,7 +36,7 @@ const Dashboard = () => {
           setParcelas(response.data.parcelas);
         }
       } catch (error) {
-        console.error("Error al obtener datos del backend:", error);
+        console.error("error al obtener datos del backend:", error);
       }
     };
 
